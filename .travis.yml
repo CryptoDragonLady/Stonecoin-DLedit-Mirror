@@ -1,5 +1,5 @@
 sudo: required
-dist: xenial
+dist: trusty
 os: linux
 language: generic
 cache:
@@ -116,6 +116,7 @@ script:
 #- cd ..; rm -rf build; mkdir build; cd build
 - "../configure --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || (
   cat config.log && false)"
+- if [ -n "$OSX_SDK" ]; then export CC=/usr/local/opt/llvm/bin/clang && export CXX=/usr/local/opt/llvm/bin/clang++; fi
 - sudo make $MAKEJOBS $GOAL || ( echo "Build failure. Verbose build follows." && sudo make $GOAL V=1 )
 - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/depends/$HOST/lib
 - if [ "$RUN_TESTS" = "true" ]; then sudo make $MAKEJOBS check VERBOSE=1; fi
