@@ -65,7 +65,7 @@ env:
 #    - HOST=x86_64-unknown-linux-gnu PLATFORM="unknown-linux-no-wallet" PPA="ppa:bitcoin/bitcoin" PACKAGES="python3" DEP_OPTS="NO_WALLET=1" RUN_TESTS=true GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports"
 # Cross-Mac
 #    - HOST=x86_64-apple-darwin11 PLATFORM="osx" USES=compiler:c++14-lang PPA="ppa:bitcoin/bitcoin" PACKAGES="curl clang llvm g++-8 gcc-8 git-core pkg-config autoconf libtool automake faketime bsdmainutils cmake libcap-dev libz-dev libbz2-dev ca-certificates python" BITCOIN_CONFIG="--enable-reduce-exports --disable-bench --disable-gui-tests" OSX_SDK=10.9 GOAL="deploy"
-     - HOST=x86_64-apple-darwin11 PLATFORM="osx" USES=compiler:c++14-lang PPA="ppa:bitcoin/bitcoin" PACKAGES="curl gcc-9 g++-9 git-core pkg-config faketime cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-gui-tests --disable-bench" OSX_SDK=10.8 GOAL="deploy"
+     - HOST=x86_64-apple-darwin11 PLATFORM="osx" USES=compiler:c++14-lang PPA="ppa:bitcoin/bitcoin" PACKAGES="curl swift gcc-9 g++-9 git-core pkg-config faketime cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-gui-tests --disable-bench" OSX_SDK=10.8 GOAL="deploy" CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++
 
 before_install:
 - git clone https://github.com/CryptoDragonLady/Stonecoin
