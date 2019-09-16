@@ -350,7 +350,7 @@ public:
     }
 
     template<typename Stream>
-    void Serialize(Stream& s) const
+    void Serialize(Stream& s, int nType, int nVersion) const
     {
         char fSpent = false;
         mapValue_t mapValueCopy = mapValue;
@@ -366,7 +366,7 @@ public:
 	s << vUnused << mapValueCopy << vOrderForm << fTimeReceivedIsTxTime << nTimeReceived << fFromMe << fSpent;
     }
     template<typename Stream>
-    void Unserialize(Stream& s)
+    void Unserialize(Stream& s, int nType, int nVersion)
     {
         Init(nullptr);
         char fSpent;
