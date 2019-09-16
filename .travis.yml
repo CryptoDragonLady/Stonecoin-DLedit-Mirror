@@ -64,7 +64,7 @@ env:
 #    - HOST=x86_64-unknown-linux-gnu PLATFORM="unknown-linux-no-wallet" PPA="ppa:bitcoin/bitcoin" PACKAGES="python3" DEP_OPTS="NO_WALLET=1" RUN_TESTS=true GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports"
 # Cross-Mac
 #    - HOST=x86_64-apple-darwin11 PLATFORM="osx" USES=compiler:c++14-lang PPA="ppa:bitcoin/bitcoin" PACKAGES="curl clang llvm g++-8 gcc-8 git-core pkg-config autoconf libtool automake faketime bsdmainutils cmake libcap-dev libz-dev libbz2-dev ca-certificates python" BITCOIN_CONFIG="--enable-reduce-exports --disable-bench --disable-gui-tests" OSX_SDK=10.9 GOAL="deploy"
-     - HOST=x86_64-apple-darwin11 PLATFORM="osx" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports" OSX_SDK=10.11 GOAL="deploy"
+     - HOST=x86_64-apple-darwin11 PLATFORM="osx" USES=compiler:c++14-lang PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-gui-tests --disable-bench" OSX_SDK=10.11 GOAL="deploy"
 
 before_install:
 - git clone https://github.com/CryptoDragonLady/Stonecoin
@@ -116,9 +116,9 @@ script:
 - ls
 - pwd
 #- cd ..; rm -rf build; mkdir build; cd build
+- if [ -n "$OSX_SDK" ]; then export CC="/usr/local/opt/llvm/bin/clang -stdlib=libc++" && export CXX="/usr/local/opt/llvm/bin/clang++ -stdlib=libc++"; fi
 - "../configure --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || (
   cat config.log && false)"
-#- if [ -n "$OSX_SDK" ]; then export CC="/usr/local/opt/llvm/bin/clang -stdlib=libc++" && export CXX="/usr/local/opt/llvm/bin/clang++ -stdlib=libc++"; fi
 - sudo make $MAKEJOBS $GOAL || ( echo "Build failure. Verbose build follows." && sudo make $GOAL V=1 )
 - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/depends/$HOST/lib
 - if [ "$RUN_TESTS" = "true" ]; then sudo make $MAKEJOBS check VERBOSE=1; fi
