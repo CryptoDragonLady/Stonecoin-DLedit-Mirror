@@ -535,7 +535,7 @@ public:
 
     template <typename Stream>
     void Serialize(Stream& s, int nType, int nVersion) const {
-         int nVersion = s.GetVersion();
+         //int nVersion = s.GetVersion();
         if (!(s.GetType() & SER_GETHASH)) {
             s << nVersion;
         }
@@ -557,7 +557,7 @@ public:
 
    template <typename Stream>
     void Unserialize(Stream& s, int nType, int nVersion) {
-        int nVersion = s.GetVersion();
+        //int nVersion = s.GetVersion();
         if (!(s.GetType() & SER_GETHASH)) {
             s >> nVersion;
         }
