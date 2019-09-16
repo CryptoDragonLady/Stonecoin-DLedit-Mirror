@@ -75,6 +75,7 @@ before_install:
 - openssl aes-256-cbc -K $encrypted_a20a463ac81c_key -iv $encrypted_a20a463ac81c_iv -in deploy_rsa.enc -out deploy_rsa -d
 - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" |
   sed "s|::|:|g")
+- make clean
 install:
 - if [ -n "$PPA" ]; then travis_retry sudo add-apt-repository "$PPA" -y; fi
 - if [ -n "$DPKG_ADD_ARCH" ]; then sudo dpkg --add-architecture "$DPKG_ADD_ARCH" ;
@@ -85,7 +86,7 @@ install:
 #- export BDB_INCLUDE_PATH="/usr/include"
 #- export BDB_LIB_PATH="/usr/lib"
 before_script:
-- unset CC; unset CXX
+#- unset CC; unset CXX
 - if [ $CHECK_DOC -eq 1 ]; then contrib/devtools/check-doc.py; fi
 - mkdir -p depends/SDKs depends/sdk-sources
 - if [ -n "$OSX_SDK" -a ! -f depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz ]; then
