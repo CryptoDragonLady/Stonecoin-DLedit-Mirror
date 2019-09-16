@@ -72,7 +72,6 @@ static const CAmount nHighTransactionMaxFeeWarning = 100 * nHighTransactionFeeWa
 static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
 static const bool DEFAULT_WALLETBROADCAST = true;
 
-class CAccountingEntry;
 class CBlockIndex;
 class CCoinControl;
 class COutput;
