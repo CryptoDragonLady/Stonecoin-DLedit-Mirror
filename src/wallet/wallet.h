@@ -502,6 +502,89 @@ public:
 
 
 /** 
+ * Internal transfers.
+ * Database key is acentry<account><counter>.
+ */
+class CAccountingEntry
+{
+public:
+    std::string strAccount;
+    CAmount nCreditDebit;
+    int64_t nTime;
+    std::string strOtherAccount;
+    std::string strComment;
+    mapValue_t mapValue;
+    int64_t nOrderPos;  //! position in ordered transaction list
+    uint64_t nEntryNo;
+
+    CAccountingEntry()
+    {
+        SetNull();
+    }
+
+    void SetNull()
+    {
+        nCreditDebit = 0;
+        nTime = 0;
+        strAccount.clear();
+        strOtherAccount.clear();
+        strComment.clear();
+        nOrderPos = -1;
+        nEntryNo = 0;
+    }
+
+    template <typename Stream>
+    void Serialize(Stream& s) const {
+         int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH)) {
+            s << nVersion;
+        }
+        //! Note: strAccount is serialized as part of the key, not here.
+        s << nCreditDebit << nTime << strOtherAccount;
+ mapValue_t mapValueCopy = mapValue;
+        WriteOrderPos(nOrderPos, mapValueCopy);
+
+        std::string strCommentCopy = strComment;
+        if (!mapValueCopy.empty() || !_ssExtra.empty()) {
+            CDataStream ss(s.GetType(), s.GetVersion());
+            ss.insert(ss.begin(), '\0');
+            ss << mapValueCopy;
+            ss.insert(ss.end(), _ssExtra.begin(), _ssExtra.end());
+            strCommentCopy.append(ss.str());
+        }
+        s << strCommentCopy;
+    }
+
+   template <typename Stream>
+    void Unserialize(Stream& s) {
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH)) {
+            s >> nVersion;
+        }
+        //! Note: strAccount is serialized as part of the key, not here.
+        s >> nCreditDebit >> nTime >> LIMITED_STRING(strOtherAccount, 65536) >> LIMITED_STRING(strComment, 65536);
+
+        size_t nSepPos = strComment.find("\0", 0, 1);
+	mapValue.clear();
+        if (std::string::npos != nSepPos) {
+            CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), s.GetType(), s.GetVersion());
+            ss >> mapValue;
+            _ssExtra = std::vector<char>(ss.begin(), ss.end());
+	}
+
+        ReadOrderPos(nOrderPos, mapValue);
+        if (std::string::npos != nSepPos) {
+            strComment.erase(nSepPos);
+	}
+        mapValue.erase("n");
+    }
+
+private:
+    std::vector<char> _ssExtra;
+};
+
+
+/** 
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
  */
@@ -942,88 +1025,5 @@ public:
     }
 };
 
-
-
-/** 
- * Internal transfers.
- * Database key is acentry<account><counter>.
- */
-class CAccountingEntry
-{
-public:
-    std::string strAccount;
-    CAmount nCreditDebit;
-    int64_t nTime;
-    std::string strOtherAccount;
-    std::string strComment;
-    mapValue_t mapValue;
-    int64_t nOrderPos;  //! position in ordered transaction list
-    uint64_t nEntryNo;
-
-    CAccountingEntry()
-    {
-        SetNull();
-    }
-
-    void SetNull()
-    {
-        nCreditDebit = 0;
-        nTime = 0;
-        strAccount.clear();
-        strOtherAccount.clear();
-        strComment.clear();
-        nOrderPos = -1;
-        nEntryNo = 0;
-    }
-
-    template <typename Stream>
-    void Serialize(Stream& s) const {
-         int nVersion = s.GetVersion();
-        if (!(s.GetType() & SER_GETHASH)) {
-            s << nVersion;
-        }
-        //! Note: strAccount is serialized as part of the key, not here.
-        s << nCreditDebit << nTime << strOtherAccount;
- mapValue_t mapValueCopy = mapValue;
-        WriteOrderPos(nOrderPos, mapValueCopy);
-
-        std::string strCommentCopy = strComment;
-        if (!mapValueCopy.empty() || !_ssExtra.empty()) {
-            CDataStream ss(s.GetType(), s.GetVersion());
-            ss.insert(ss.begin(), '\0');
-            ss << mapValueCopy;
-            ss.insert(ss.end(), _ssExtra.begin(), _ssExtra.end());
-            strCommentCopy.append(ss.str());
-        }
-        s << strCommentCopy;
-    }
-
-   template <typename Stream>
-    void Unserialize(Stream& s) {
-        int nVersion = s.GetVersion();
-        if (!(s.GetType() & SER_GETHASH)) {
-            s >> nVersion;
-        }
-        //! Note: strAccount is serialized as part of the key, not here.
-        s >> nCreditDebit >> nTime >> LIMITED_STRING(strOtherAccount, 65536) >> LIMITED_STRING(strComment, 65536);
-
-        size_t nSepPos = strComment.find("\0", 0, 1);
-	mapValue.clear();
-        if (std::string::npos != nSepPos) {
-            CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), s.GetType(), s.GetVersion());
-            ss >> mapValue;
-            _ssExtra = std::vector<char>(ss.begin(), ss.end());
-	}
-
-        ReadOrderPos(nOrderPos, mapValue);
-        if (std::string::npos != nSepPos) {
-            strComment.erase(nSepPos);
-	}
-        mapValue.erase("n");
-    }
-
-private:
-    std::vector<char> _ssExtra;
-};
 
 #endif // BITCOIN_WALLET_WALLET_H
