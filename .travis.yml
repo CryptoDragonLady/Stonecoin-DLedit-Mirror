@@ -34,8 +34,7 @@ env:
   - PPA="ppa:bitcoin/bitcoin"
   - RBITS=$(cat /dev/urandom | head -c 64 | base64 | tr -cd '[:alnum:]' | head -c 8 ;)
   - USES=compiler:c++14-lang 
- 
-matrix:
+  matrix: 
 
 #os: osx
 #    osx_image: xcode10
